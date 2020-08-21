@@ -3,52 +3,102 @@
 
 IRTherm therm; //Infrared sensor object
 
-//volatile int pwm_value = 0; //PWM signal value
-//volatile int prev_time = 0; //Value of the previous time before falling edge of PWM signal
+const int delay_ = 10; //Delay loop value, constant for now, in milliseconds
 
-const int delay_ = 2000; //Delay loop value, constant for now, in milliseconds
 const int PWM_PIN = 4; //PWM pin
+const int NUM_READINGS = 5; //Constant number of readings, increase to increase ultrasonic accuracy at the cost of time
+int range_readings[NUM_READINGS]; //Array to hold rangefinder reading values
+long startTime = 0; //Start time value for range readings
+long endTime = 0; //End time value for range readings
+
+const int VIB_MOTOR_PIN = 7;
 
 void setup() {
   Serial.begin(9600);
   therm.begin();
   therm.setUnit(TEMP_F);
   pinMode(PWM_PIN, INPUT);
+  pinMode(VIB_MOTOR_PIN, OUTPUT);
 }
 
 void loop() {
-  //READING IR SENSOR OUTPUT
+  //Take IR reading and print it
+  infraredReading();
+  //Take Ultrasonic reading and print it
+  //ultrasonicReading();
+  
+  if(therm.object() > 90.00){
+    vibrateMotor(2);
+  }
+   
+  Serial.println("---------------------------------------"); //Separates loops from each other
+  delay(delay_);
+}
+
+//Function to swap two array elements
+void swap(int *xp, int *yp)  
+{  
+    int temp = *xp;  
+    *xp = *yp;  
+    *yp = temp;  
+}  
+  
+// A function to implement bubble sort  
+void bubbleSort(int arr[], int n)  
+{  
+    int i, j;  
+    for (i = 0; i < n-1; i++)      
+      
+    // Last i elements are already in place  
+    for (j = 0; j < n-i-1; j++)  
+        if (arr[j] > arr[j+1])  
+            swap(&arr[j], &arr[j+1]);  
+}  
+
+//READING RANGEFINDER OUTPUT USING MEDIAN FILTER
+void ultrasonicReading(){
+  startTime = micros();
+  for(int i = 0; i<NUM_READINGS; i++){
+      range_readings[i] = pulseIn(PWM_PIN, HIGH);
+  }
+  endTime = micros();
+  Serial.print("Time taken for range readings: ");
+  Serial.println(endTime-startTime);
+  
+  //SORT READINGS
+  bubbleSort(range_readings, NUM_READINGS);
+  
+  //MEDIAN VALUE
+  int val = range_readings[NUM_READINGS /2];
+  
+  Serial.print("Ultrasonic reading: ");
+  Serial.println(val);
+  
+}
+
+//READING IR SENSOR OUTPUT
+void infraredReading(){
   if (therm.read()) // On success, read() will return 1, on fail 0.
   {
     // Use the object() and ambient() functions to grab the object and ambient
     // temperatures.
     // They'll be floats, calculated out to the unit you set with setUnit().
-    Serial.print("Object temp: " + String(therm.object(), 2));
-    Serial.println("F");
-    Serial.print("Ambient temp: " + String(therm.ambient(), 2));
-    Serial.println("F");
+    //Serial.print("Object temp: " + String(therm.object(), 2));
+    Serial.print("Object temp:");
+    Serial.print(therm.object());
+    Serial.print(",");
+    Serial.print("Ambient temp:");
+    Serial.println(therm.ambient());
+    //Serial.println("F");
+    //Serial.print("Ambient temp: " + String(therm.ambient(), 2));
+    //Serial.println("F");
   }else{
     Serial.println("Signal not found, check IR connections...");
   }
-  
-  //READING RANGEFINDER OUTPUT
-  int val = pulseIn(PWM_PIN, HIGH);
-  Serial.println("Ultrasonic reading: " + val);
-
-  Serial.println("---------------------------------------"); //Separates loops from each other
-  
-  //attachInterrupt(0, rising, RISING);
-  delay(delay_);
 }
 
-/*void rising(){
-  attachInterrupt(0, falling, FALLING);
-  prev_time = micros();
+void vibrateMotor(int seconds){
+    digitalWrite(VIB_MOTOR_PIN, HIGH);
+    delay(seconds * 1000);
+    digitalWrite(VIB_MOTOR_PIN, LOW);
 }
-
-void falling() {
-  attachInterrupt(0, rising, RISING);
-  pwm_value = micros()-prev_time;
-  Serial.println("PWM Value: " + pwm_value);
-  Serial.println("---------------------------------------");
-}*/
