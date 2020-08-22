@@ -27,7 +27,8 @@ void loop() {
   while(Serial.available()){
     DISTANCE = (Serial.read()-'0');  
     for(int i = 0; i<100; i++){
-      infraredReading();  
+      infraredReading();
+      delay(10);  
     }
   }
   
@@ -41,7 +42,6 @@ void loop() {
   //}
    
   //Serial.println("---------------------------------------"); //Separates loops from each other
-  delay(delay_);
 }
 
 //Function to swap two array elements
