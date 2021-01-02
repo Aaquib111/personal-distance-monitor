@@ -4,7 +4,7 @@
 int state = 0;
 int increment = 0;
 
-const int VIB_MOTOR_PIN = 8;
+const int VIB_MOTOR_PIN = 11;
 
 IRTherm therm; //Infrared sensor object
 
