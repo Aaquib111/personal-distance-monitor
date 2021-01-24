@@ -18,14 +18,14 @@ void setup() {
   Wire.begin();
   delay(2000);
   
-  therm.begin();
-  therm.setUnit(TEMP_F);
+  //therm.begin();
+  //therm.setUnit(TEMP_F);
 
   if(irsensor.begin() == false){
     Serial.println("Device not found. Check wiring, then restart.");
     while(1);
   }else{
-    Serial.println("Started.");  
+    //Serial.println("Started.");  
   }
   multiplier = irsensor.getMultiplier();
 
@@ -39,8 +39,24 @@ void setup() {
 }
 
 void loop() {
-  infraredReading();
-  delay(100);
+  if(Serial.available()){
+    int b = Serial.read();
+    double sum = 0;
+    Serial.println("Distance,IR_Value");
+    for(int j = 0; j < 12; j++){
+      delay(5000);
+      for(int i = 0; i < 50; i++){
+        sum = sum + humanReading();
+        delay(50);  
+      }
+      double avg = sum / 50;
+      Serial.print(j);
+      Serial.print(",");
+      Serial.println(avg);
+      avg = 0;
+      sum = 0;
+    }
+  }
 }
  
 
@@ -58,15 +74,16 @@ void infraredReading(){
   }
 }
 
-void sparkXReading(){
+int sparkXReading(){
   int data;
   data = irsensor.getAnalogData(0);   //Retrieve raw data value from sensor
   //Serial.print("ADC input voltage: ");
-  Serial.println(data * multiplier);
+  int val = data * multiplier;
   //Serial.println("mV");
+  return val;
 }
 
-void gridReading(){
+int gridReading(){
   //returns hottest pixel
   float testPixelValue = 0;
   float hotPixelValue = 0;
@@ -76,10 +93,12 @@ void gridReading(){
         hotPixelValue = testPixelValue;
       }
   }
-  Serial.println(hotPixelValue);
+  //Serial.println(hotPixelValue);
+  return hotPixelValue;
 }
 
-void humanReading(){
+int humanReading(){
+  int m = -1;
   //returns hottest value
   if (movementSensor.available())
   {
@@ -87,9 +106,8 @@ void humanReading(){
     int ir2 = movementSensor.getIR2();
     int ir3 = movementSensor.getIR3();
     int ir4 = movementSensor.getIR4();
-    int m = max(ir1, max(ir2, max(ir3, ir4)));
+    m = max(ir1, max(ir2, max(ir3, ir4)));
     movementSensor.refresh();
-    Serial.println(m);
   }
-  
+  return m;
 }
