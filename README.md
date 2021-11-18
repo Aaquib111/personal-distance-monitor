@@ -31,4 +31,4 @@ Currently, this repository is a work in progress. Downloadable code, detailed do
 - Human Research: Madelline Raihle, Sinead Doyle
 - Mentors: Dr. Figueiredo, Glen Meyerowitz
 - Other: Mrs. Stephanie McKinney (Social Worker)
-- And all others!
+- And all others who participated!
