@@ -25,7 +25,7 @@ Currently, this repository is a work in progress. Downloadable code, detailed do
 
 ## Credits
 - Members of the InvenTeam:
-- Engineering: Aaquib Syed, Tyler Nagowsky
+- Engineering: Aaquib Syed, Tyler Nagosky
 - Communications: Liza Lleshaj, Jensen Herbst, Kelsey Most
 - Finances: Rehan Mian, Eric Pentecost
 - Human Research: Madelline Raihle, Sinead Doyle
